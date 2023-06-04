@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/seaung/hystrix/internal/hystrix/store"
+	"github.com/seaung/hystrix/internal/pkg/errno"
 	v1 "github.com/seaung/hystrix/pkg/api/hystrix/v1"
+	"github.com/seaung/hystrix/pkg/auth"
 	"github.com/seaung/hystrix/pkg/token"
 )
 
@@ -49,12 +51,12 @@ func (u *userBiz) Login(ctx context.Context, r *v1.LoginFormRequest) (*v1.LoginT
 	}
 
 	if err := auth.Compare(user.Password, r.Password); err != nil {
-		return nil, PasswordIncorrectError
+		return nil, errno.PasswordIncorrectError
 	}
 
 	tokenString, err := token.SignToken(r.Username)
 	if err != nil {
-		return errno.SignTokenError
+		return nil, errno.SignTokenError
 	}
 
 	return &v1.LoginTokenResponse{Token: tokenString}, nil
